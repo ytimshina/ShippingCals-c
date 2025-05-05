@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Access-Control-Allow-Origin" content="*">
     <title>Advanced Freight Shipping Calculator</title>
     <style>
         body {
@@ -323,6 +324,14 @@
             margin: 0.5rem 0;
             padding-left: 1.5rem;
         }
+        .debug-info {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f1f1f1;
+            border-radius: 4px;
+            font-size: 12px;
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -494,6 +503,11 @@
                 </div>
 
                 <button id="calculate-btn" class="btn btn-primary btn-block">Calculate Freight Cost</button>
+                
+                <div class="debug-info" id="debug-info">
+                    <h4>Debug Information</h4>
+                    <div id="debug-content"></div>
+                </div>
             </div>
 
             <div class="results-section">
@@ -690,6 +704,15 @@
             'DE': [51.7, 45.1, 37.4, 26.4],
             'FL': [53.9, 49.5, 41.8, 37.4],
             // Additional states would be added here
+            'TX': [54.5, 47.2, 40.1, 35.6],
+            'NY': [58.7, 51.3, 45.2, 39.8],
+            'GA': [45.6, 41.2, 35.4, 29.3],
+            'OH': [47.8, 43.5, 37.9, 32.4],
+            'IL': [49.3, 44.7, 39.2, 33.8],
+            'MI': [52.1, 47.8, 41.5, 36.2],
+            'PA': [55.5, 49.9, 43.7, 37.5],
+            'KY': [44.2, 40.1, 35.6, 29.8],
+            'UT': [52.3, 46.8, 40.3, 35.1]
         };
         
         // Constants based on flowchart
@@ -725,8 +748,45 @@
             return data;
         }
         
+        // Debug logging helper function
+        function debugLog(message, data) {
+            const debugDiv = document.getElementById('debug-info');
+            const debugContent = document.getElementById('debug-content');
+            
+            if (!debugDiv || !debugContent) return;
+            
+            // Show debug div
+            debugDiv.style.display = 'block';
+            
+            // Create log entry
+            const logEntry = document.createElement('div');
+            logEntry.style.marginBottom = '10px';
+            
+            // Add timestamp
+            const timestamp = new Date().toLocaleTimeString();
+            logEntry.innerHTML = `<strong>[${timestamp}]</strong> ${message}<br>`;
+            
+            // Add data if provided
+            if (data) {
+                if (typeof data === 'object') {
+                    logEntry.innerHTML += `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+                } else {
+                    logEntry.innerHTML += `<pre>${data}</pre>`;
+                }
+            }
+            
+            // Add to debug content
+            debugContent.appendChild(logEntry);
+            
+            // Scroll to bottom
+            debugDiv.scrollTop = debugDiv.scrollHeight;
+        }
+        
         // Update UI with dimensions from parent page
         function updateDimensionsUI(data) {
+            // Log received data
+            debugLog('Received data from URL parameters', data);
+            
             // Update text display for dimensions
             if (data.width && data.length && data.height && data.weight) {
                 document.getElementById('width').value = data.width;
@@ -741,6 +801,11 @@
                 
                 // Scale 3D box based on dimensions
                 updatePackageVisualization(data.width, data.length, data.height);
+            }
+            
+            // Update curb type if provided
+            if (data.curbType) {
+                document.getElementById('curb-type').value = data.curbType;
             }
             
             // Update quote number if available
@@ -844,6 +909,8 @@
         
         // Calculate truck load type and freight charge
         function calculateFreight(data) {
+            debugLog('Calculating freight with data', data);
+            
             const width = parseFloat(data.width);
             const length = parseFloat(data.length);
             const height = parseFloat(data.height);
@@ -918,7 +985,7 @@
                 }
             }
             
-            return {
+            const result = {
                 weightPer100,
                 freightColumn,
                 baseRate,
@@ -928,6 +995,10 @@
                 wideLoad,
                 largeTruckQualified
             };
+            
+            debugLog('Freight calculation result', result);
+            
+            return result;
         }
         
         // Format currency for display
@@ -1086,10 +1157,41 @@
             };
         }
         
+        // Send data back to parent window
+        function sendDataToParent(shippingCost, shippingType) {
+            debugLog('Attempting to send data to parent window', { shippingCost, shippingType });
+            
+            // Check if we have a parent window
+            if (window.opener && window.opener !== window) {
+                try {
+                    // Remove dollar sign if present
+                    const cost = shippingCost.replace(', '');
+                    
+                    // Send message to parent window
+                    window.opener.postMessage({
+                        shippingCost: cost,
+                        shippingType: shippingType
+                    }, '*'); // In production, specify exact origin for security
+                    
+                    debugLog('Message sent to parent window');
+                    
+                    // Close this window
+                    setTimeout(() => window.close(), 500);
+                } catch (error) {
+                    debugLog('Error sending message to parent', error.message);
+                    alert('Error sending data to parent window: ' + error.message);
+                }
+            } else {
+                debugLog('No parent window found');
+                alert('Shipping cost: ' + shippingCost + '\nCannot communicate with parent window.');
+            }
+        }
+        
         // Event handlers
         document.addEventListener('DOMContentLoaded', function() {
             // Get data from URL parameters
             const urlParams = getUrlParams();
+            debugLog('URL parameters detected', urlParams);
             
             // Update UI if data exists
             if (urlParams.width && urlParams.length && urlParams.height && urlParams.weight) {
@@ -1139,17 +1241,7 @@
                 const truckLoadType = document.getElementById('result-truck-load-type').textContent;
                 
                 // Send data back to parent window
-                if (window.opener && window.opener !== window) {
-                    window.opener.postMessage({
-                        shippingCost: freightCharge.replace(', ''),
-                        shippingType: truckLoadType
-                    }, '*'); // In production, specify exact origin for security
-                    
-                    // Close this window
-                    setTimeout(() => window.close(), 500);
-                } else {
-                    alert('Shipping cost: ' + freightCharge + '\nCannot communicate with parent window.');
-                }
+                sendDataToParent(freightCharge, truckLoadType);
             });
             
             // Show/hide calculation steps
