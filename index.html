@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Access-Control-Allow-Origin" content="*">
+    <meta http-equiv="Access-Control-Allow-Methods" content="GET, POST, OPTIONS">
+    <meta http-equiv="Access-Control-Allow-Headers" content="Content-Type">
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
     <title>Advanced Freight Shipping Calculator</title>
     <style>
         body {
@@ -738,14 +741,25 @@
         
         // Parse URL parameters from parent page
         function getUrlParams() {
-            const params = new URLSearchParams(window.location.search);
-            const data = {};
-            
-            for (const [key, value] of params) {
-                data[key] = value;
+            try {
+                const params = new URLSearchParams(window.location.search);
+                const data = {};
+                
+                for (const [key, value] of params) {
+                    // Decode URI component to handle special characters
+                    data[key] = decodeURIComponent(value);
+                }
+                
+                // Show debug info immediately
+                document.getElementById('debug-info').style.display = 'block';
+                debugLog('Raw URL parameters:', window.location.search);
+                debugLog('Parsed URL parameters:', data);
+                
+                return data;
+            } catch (error) {
+                debugLog('Error parsing URL parameters:', error.message);
+                return {};
             }
-            
-            return data;
         }
         
         // Debug logging helper function
@@ -785,32 +799,62 @@
         // Update UI with dimensions from parent page
         function updateDimensionsUI(data) {
             // Log received data
-            debugLog('Received data from URL parameters', data);
+            debugLog('Attempting to update UI with data', data);
             
             // Update text display for dimensions
             if (data.width && data.length && data.height && data.weight) {
-                document.getElementById('width').value = data.width;
-                document.getElementById('length').value = data.length;
-                document.getElementById('height').value = data.height;
-                document.getElementById('weight').value = data.weight;
-                
-                // Update 3D visualization
-                document.getElementById('vis-width').textContent = data.width;
-                document.getElementById('vis-length').textContent = data.length;
-                document.getElementById('vis-height').textContent = data.height;
-                
-                // Scale 3D box based on dimensions
-                updatePackageVisualization(data.width, data.length, data.height);
+                try {
+                    // Convert to numbers and handle possible errors
+                    const width = parseFloat(data.width) || 0;
+                    const length = parseFloat(data.length) || 0;
+                    const height = parseFloat(data.height) || 0;
+                    const weight = parseFloat(data.weight) || 0;
+                    
+                    // Update form fields
+                    document.getElementById('width').value = width;
+                    document.getElementById('length').value = length;
+                    document.getElementById('height').value = height;
+                    document.getElementById('weight').value = weight;
+                    
+                    // Update 3D visualization
+                    document.getElementById('vis-width').textContent = width.toString();
+                    document.getElementById('vis-length').textContent = length.toString();
+                    document.getElementById('vis-height').textContent = height.toString();
+                    
+                    // Scale 3D box based on dimensions
+                    updatePackageVisualization(width, length, height);
+                    
+                    debugLog('Successfully updated dimensions UI');
+                } catch (error) {
+                    debugLog('Error updating dimensions UI', error.message);
+                }
+            } else {
+                debugLog('Missing dimension or weight data', {
+                    width: data.width,
+                    length: data.length,
+                    height: data.height,
+                    weight: data.weight
+                });
             }
             
             // Update curb type if provided
             if (data.curbType) {
-                document.getElementById('curb-type').value = data.curbType;
+                try {
+                    document.getElementById('curb-type').value = data.curbType;
+                    debugLog('Updated curb type to', data.curbType);
+                } catch (error) {
+                    debugLog('Error updating curb type', error.message);
+                }
             }
             
             // Update quote number if available
             if (data.quoteNumber) {
-                document.getElementById('quote-number').textContent = data.quoteNumber;
+                try {
+                    document.getElementById('quote-number').textContent = data.quoteNumber;
+                    debugLog('Updated quote number to', data.quoteNumber);
+                } catch (error) {
+                    debugLog('Error updating quote number', error.message);
+                }
             }
         }
         
