@@ -6,771 +6,116 @@
     <meta http-equiv="Access-Control-Allow-Origin" content="*">
     <meta http-equiv="Access-Control-Allow-Methods" content="GET, POST, OPTIONS">
     <meta http-equiv="Access-Control-Allow-Headers" content="Content-Type">
-    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
-    <title>Advanced Freight Shipping Calculator</title>
+    <title>Simple Calculator Test</title>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            color: #333;
-            background-color: #f5f5f5;
-        }
-        header {
-            background-color: #2c3e50;
-            color: white;
-            padding: 1rem;
-            text-align: center;
-        }
-        .container {
-            max-width: 1200px;
+            font-family: Arial, sans-serif;
+            max-width: 800px;
             margin: 0 auto;
-            padding: 1.5rem;
+            padding: 20px;
         }
-        .quote-info {
-            text-align: center;
-            margin-bottom: 1.5rem;
-            background-color: #e8f4fc;
-            padding: 0.75rem;
-            border-radius: 4px;
+        .data-display {
+            background-color: #f4f4f4;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
         }
-        .quote-number {
-            font-weight: bold;
-            color: #2c3e50;
-            font-size: 1.2rem;
-        }
-        .calculator-wrapper {
-            display: flex;
-            gap: 2rem;
-            flex-wrap: wrap;
-        }
-        .input-section, .results-section {
-            flex: 1;
-            min-width: 350px;
-            background-color: #fff;
-            border-radius: 8px;
-            padding: 1.5rem;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        .section-title {
-            color: #2c3e50;
-            border-bottom: 2px solid #e8f4fc;
-            padding-bottom: 0.5rem;
+        h2 {
             margin-top: 0;
+            color: #333;
         }
-        .form-group {
-            margin-bottom: 1.25rem;
-        }
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-            color: #2c3e50;
-        }
-        input, select {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 0.9rem;
-        }
-        input:focus, select:focus {
-            outline: none;
-            border-color: #3498db;
-            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
-        }
-        .dimensions-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1rem;
-        }
-        .btn {
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.2s ease;
-        }
-        .btn-block {
-            width: 100%;
-            margin-top: 1rem;
-        }
-        .btn-primary {
-            background-color: #2c3e50;
-            color: white;
-        }
-        .btn-primary:hover {
-            background-color: #1a252f;
-        }
-        .btn-secondary {
-            background-color: #95a5a6;
-            color: white;
-        }
-        .btn-secondary:hover {
-            background-color: #7f8c8d;
-        }
-        .product-visualization {
-            background-color: #f9f9f9;
-            padding: 1.5rem;
-            border-radius: 4px;
-            margin-bottom: 1.5rem;
-            text-align: center;
-        }
-        .package-3d {
-            position: relative;
-            width: 180px;
-            height: 160px;
-            transform-style: preserve-3d;
-            transform: rotateX(15deg) rotateY(25deg);
-            transition: transform 0.3s ease;
-            margin: 0 auto;
-        }
-        .package-3d:hover {
-            transform: rotateX(25deg) rotateY(35deg);
-        }
-        .face {
-            position: absolute;
-            box-sizing: border-box;
-            border: 2px solid #2c3e50;
-        }
-        .front {
-            width: 100%;
-            height: 100%;
-            background-color: rgba(44, 62, 80, 0.7);
-            transform: translateZ(50px);
-        }
-        .back {
-            width: 100%;
-            height: 100%;
-            background-color: rgba(44, 62, 80, 0.4);
-            transform: translateZ(-50px) rotateY(180deg);
-        }
-        .top {
-            width: 100%;
-            height: 100px;
-            background-color: rgba(44, 62, 80, 0.6);
-            transform: rotateX(90deg) translateZ(50px);
-        }
-        .bottom {
-            width: 100%;
-            height: 100px;
-            background-color: rgba(44, 62, 80, 0.5);
-            transform: rotateX(-90deg) translateZ(110px);
-        }
-        .left {
-            width: 100px;
-            height: 100%;
-            background-color: rgba(44, 62, 80, 0.5);
-            transform: rotateY(-90deg) translateZ(50px);
-        }
-        .right {
-            width: 100px;
-            height: 100%;
-            background-color: rgba(44, 62, 80, 0.6);
-            transform: rotateY(90deg) translateZ(130px);
-        }
-        .dimension-text {
-            position: absolute;
-            color: white;
-            font-weight: bold;
-            text-align: center;
-            font-size: 0.8rem;
-        }
-        .width-text {
-            bottom: 5px;
-            width: 100%;
-        }
-        .length-text {
-            top: 50%;
-            right: -60px;
-            transform: translateY(-50%) rotateZ(90deg);
-        }
-        .height-text {
-            top: -40px;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-        .card {
-            background-color: #fff;
-            border-radius: 8px;
-            padding: 1.5rem;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            margin-bottom: 1.5rem;
-        }
-        .calculation-steps {
-            margin-top: 1.5rem;
-            display: none;
-        }
-        .step {
-            background-color: #f9f9f9;
-            border-left: 4px solid #3498db;
-            padding: 0.75rem;
-            margin-bottom: 0.75rem;
-            font-size: 0.9rem;
-        }
-        .step-title {
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 0.5rem;
-        }
-        .results-container {
-            display: none;
-        }
-        .result-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 0.75rem 0;
-            border-bottom: 1px solid #eee;
-        }
-        .result-item:last-child {
-            border-bottom: none;
-        }
-        .result-label {
-            font-weight: 600;
-        }
-        .result-value {
-            font-weight: 700;
-            color: #2c3e50;
-        }
-        .total-section {
-            background-color: #e8f4fc;
-            padding: 1rem;
-            border-radius: 4px;
-            margin-top: 1.5rem;
-        }
-        .total-cost {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #2c3e50;
-            text-align: center;
-            margin: 0.5rem 0;
-        }
-        .action-buttons {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 1.5rem;
-        }
-        .city-specific {
-            background-color: #e8f4fc;
-            padding: 0.75rem;
-            border-radius: 4px;
-            margin-bottom: 1rem;
-            font-weight: 500;
-        }
-        .notes-section {
-            margin-top: 1.5rem;
-            padding: 0.75rem;
-            background-color: #f9f9f9;
-            border-radius: 4px;
-            font-size: 0.9rem;
-        }
-        .notes-title {
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 0.5rem;
-        }
-        .show-calculation-toggle {
-            background: none;
-            border: none;
-            color: #3498db;
-            cursor: pointer;
-            text-decoration: underline;
-            padding: 0;
-            font-size: 0.9rem;
-            margin-top: 0.5rem;
-        }
-        #shipping-rate-table {
+        table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 1rem;
-            font-size: 0.8rem;
-        }
-        #shipping-rate-table th, #shipping-rate-table td {
-            border: 1px solid #ddd;
-            padding: 0.5rem;
-            text-align: center;
-        }
-        #shipping-rate-table th {
-            background-color: #f2f2f2;
-            font-weight: 600;
-        }
-        #shipping-rate-table tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-        .table-container {
-            margin-top: 1.5rem;
-            display: none;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-        .show-rates-toggle {
-            background: none;
-            border: none;
-            color: #3498db;
-            cursor: pointer;
-            text-decoration: underline;
-            padding: 0;
-            font-size: 0.9rem;
-            margin-top: 0.5rem;
-        }
-        .curb-types {
-            max-height: 200px;
-            overflow-y: auto;
-            background-color: #f9f9f9;
-            padding: 0.75rem;
-            border-radius: 4px;
-            margin-bottom: 1rem;
-            font-size: 0.85rem;
-        }
-        .curb-type-list {
-            margin: 0.5rem 0;
-            padding-left: 1.5rem;
-        }
-        .debug-info {
             margin-top: 20px;
+        }
+        th, td {
             padding: 10px;
-            background-color: #f1f1f1;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background-color: #f0f0f0;
+        }
+        .url-info {
+            background-color: #e9f7ef;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            word-break: break-all;
+        }
+        pre {
+            background-color: #f9f9f9;
+            padding: 10px;
             border-radius: 4px;
-            font-size: 12px;
-            display: none;
+            overflow-x: auto;
+        }
+        .action-buttons {
+            margin-top: 20px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>Advanced Freight Shipping Calculator</h1>
-    </header>
-
-    <div class="container">
-        <div class="quote-info">
-            <span>Quote Number: </span>
-            <span class="quote-number" id="quote-number">Q-000000</span>
-        </div>
-
-        <div class="calculator-wrapper">
-            <div class="input-section">
-                <h2 class="section-title">Product Information</h2>
-                
-                <div class="product-visualization">
-                    <div class="package-3d" id="package-3d">
-                        <div class="face front">
-                            <div class="dimension-text width-text">Width: <span id="vis-width">42.13</span>"</div>
-                        </div>
-                        <div class="face back"></div>
-                        <div class="face top">
-                            <div class="dimension-text height-text">Height: <span id="vis-height">14</span>"</div>
-                        </div>
-                        <div class="face bottom"></div>
-                        <div class="face left">
-                            <div class="dimension-text length-text">Length: <span id="vis-length">42.13</span>"</div>
-                        </div>
-                        <div class="face right"></div>
-                    </div>
-                </div>
-
-                <div class="city-specific">
-                    This calculator is specifically designed for shipments from/to Louisville and Salt Lake City locations.
-                </div>
-
-                <div class="form-group">
-                    <label for="curb-type">Curb Type</label>
-                    <select id="curb-type">
-                        <option value="">Select Curb Type</option>
-                        <option value="MBC1">MBC1</option>
-                        <option value="MBC3">MBC3</option>
-                        <option value="MBC7">MBC7</option>
-                        <option value="MBC7-3Piece">MBC7-3 Piece</option>
-                        <option value="Butler-IF">Butler IF Duraorb</option>
-                        <option value="MBC9">MBC9</option>
-                        <option value="MBC10">MBC10</option>
-                        <option value="MBC11">MBC11</option>
-                        <option value="MBC12">MBC12</option>
-                        <option value="Inner-Curb">Inner Curb</option>
-                        <option value="Base-Panel">Base Panel</option>
-                        <option value="BR-II">BR-II</option>
-                        <option value="MBC7-Extended">MBC7 Extended</option>
-                        <option value="Seam-Kit">Seam Kit</option>
-                        <option value="Butler-Base-Panel">Butler Base Panel</option>
-                        <option value="OC-1">OC-1</option>
-                        <option value="OC-2">OC-2</option>
-                        <option value="OC-3">OC-3</option>
-                        <option value="OC-4">OC-4</option>
-                        <option value="OC-5">OC-5</option>
-                        <option value="OC-6">OC-6</option>
-                    </select>
-                </div>
-
-                <div class="curb-types">
-                    <div><strong>Add On 1 Curb Types:</strong></div>
-                    <div class="curb-type-list">MBC1, MBC3, MBC7, MBC7-3 Piece, Butler IF Duraorb, MBC9, MBC10, MBC11</div>
-                    
-                    <div><strong>Add On 2 Curb Types:</strong></div>
-                    <div class="curb-type-list">Butler IF, Duraorb, MBC9, MBC10, MBC11, MBC12, Inner Curb</div>
-                    
-                    <div><strong>Add On 3 Curb Types:</strong></div>
-                    <div class="curb-type-list">Base Panel, BR-II, MBC7 Extended, Seam Kit</div>
-                    
-                    <div><strong>Add On 4 Curb Types:</strong></div>
-                    <div class="curb-type-list">OC-1, OC-2, OC-3, OC-4, OC-5, OC-6</div>
-                </div>
-
-                <div class="dimensions-grid">
-                    <div class="form-group">
-                        <label for="width">Width (in)</label>
-                        <input type="number" id="width" step="0.01" min="0">
-                    </div>
-                    <div class="form-group">
-                        <label for="length">Length (in)</label>
-                        <input type="number" id="length" step="0.01" min="0">
-                    </div>
-                    <div class="form-group">
-                        <label for="height">Height (in)</label>
-                        <input type="number" id="height" step="0.01" min="0">
-                    </div>
-                    <div class="form-group">
-                        <label for="weight">Weight (lbs)</label>
-                        <input type="number" id="weight" step="0.1" min="0">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="shipping-location">Shipping Location</label>
-                    <select id="shipping-location">
-                        <option value="">Select Location</option>
-                        <option value="louisville">Louisville</option>
-                        <option value="saltlake">Salt Lake City</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="destination-state">Destination State</label>
-                    <select id="destination-state">
-                        <option value="">Select State</option>
-                        <option value="AL">Alabama</option>
-                        <option value="AK">Alaska</option>
-                        <option value="AZ">Arizona</option>
-                        <option value="AR">Arkansas</option>
-                        <option value="CA">California</option>
-                        <option value="CO">Colorado</option>
-                        <option value="CT">Connecticut</option>
-                        <option value="DE">Delaware</option>
-                        <option value="FL">Florida</option>
-                        <option value="GA">Georgia</option>
-                        <option value="HI">Hawaii</option>
-                        <option value="ID">Idaho</option>
-                        <option value="IL">Illinois</option>
-                        <option value="IN">Indiana</option>
-                        <option value="IA">Iowa</option>
-                        <option value="KS">Kansas</option>
-                        <option value="KY">Kentucky</option>
-                        <option value="LA">Louisiana</option>
-                        <option value="ME">Maine</option>
-                        <option value="MD">Maryland</option>
-                        <option value="MA">Massachusetts</option>
-                        <option value="MI">Michigan</option>
-                        <option value="MN">Minnesota</option>
-                        <option value="MS">Mississippi</option>
-                        <option value="MO">Missouri</option>
-                        <option value="MT">Montana</option>
-                        <option value="NE">Nebraska</option>
-                        <option value="NV">Nevada</option>
-                        <option value="NH">New Hampshire</option>
-                        <option value="NJ">New Jersey</option>
-                        <option value="NM">New Mexico</option>
-                        <option value="NY">New York</option>
-                        <option value="NC">North Carolina</option>
-                        <option value="ND">North Dakota</option>
-                        <option value="OH">Ohio</option>
-                        <option value="OK">Oklahoma</option>
-                        <option value="OR">Oregon</option>
-                        <option value="PA">Pennsylvania</option>
-                        <option value="RI">Rhode Island</option>
-                        <option value="SC">South Carolina</option>
-                        <option value="SD">South Dakota</option>
-                        <option value="TN">Tennessee</option>
-                        <option value="TX">Texas</option>
-                        <option value="UT">Utah</option>
-                        <option value="VT">Vermont</option>
-                        <option value="VA">Virginia</option>
-                        <option value="WA">Washington</option>
-                        <option value="WV">West Virginia</option>
-                        <option value="WI">Wisconsin</option>
-                        <option value="WY">Wyoming</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="zip-code">Destination ZIP Code</label>
-                    <input type="text" id="zip-code" placeholder="Enter ZIP code">
-                </div>
-
-                <button id="calculate-btn" class="btn btn-primary btn-block">Calculate Freight Cost</button>
-                
-                <div class="debug-info" id="debug-info">
-                    <h4>Debug Information</h4>
-                    <div id="debug-content"></div>
-                </div>
-            </div>
-
-            <div class="results-section">
-                <h2 class="section-title">Calculation Results</h2>
-                
-                <div id="calculation-instructions">
-                    <p>Enter the product details and shipping information on the left to calculate freight costs.</p>
-                    <p>This calculator follows the specific freight calculation logic for HVAC curbs and adapters.</p>
-                    
-                    <button class="show-rates-toggle" id="show-rates-toggle">Show Shipping Rate Table</button>
-                    
-                    <div class="table-container" id="rate-table-container">
-                        <table id="shipping-rate-table">
-                            <thead>
-                                <tr>
-                                    <th>State</th>
-                                    <th>Weight/100 (0 to 5)</th>
-                                    <th>Weight/100 (6 to 10)</th>
-                                    <th>Weight/100 (11 to 20)</th>
-                                    <th>Weight/100 (20+)</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>AL</td>
-                                    <td>40.7</td>
-                                    <td>37.4</td>
-                                    <td>29.7</td>
-                                    <td>24.2</td>
-                                </tr>
-                                <tr>
-                                    <td>AR</td>
-                                    <td>42.9</td>
-                                    <td>39.6</td>
-                                    <td>36.3</td>
-                                    <td>30.8</td>
-                                </tr>
-                                <tr>
-                                    <td>AZ</td>
-                                    <td>56.1</td>
-                                    <td>45.1</td>
-                                    <td>38.5</td>
-                                    <td>33.0</td>
-                                </tr>
-                                <tr>
-                                    <td>CA</td>
-                                    <td>64.9</td>
-                                    <td>52.8</td>
-                                    <td>44.0</td>
-                                    <td>37.4</td>
-                                </tr>
-                                <tr>
-                                    <td>CO</td>
-                                    <td>60.5</td>
-                                    <td>49.5</td>
-                                    <td>39.6</td>
-                                    <td>38.5</td>
-                                </tr>
-                                <tr>
-                                    <td>CT</td>
-                                    <td>63.8</td>
-                                    <td>52.8</td>
-                                    <td>44.0</td>
-                                    <td>41.8</td>
-                                </tr>
-                                <tr>
-                                    <td>FL</td>
-                                    <td>53.9</td>
-                                    <td>49.5</td>
-                                    <td>41.8</td>
-                                    <td>37.4</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div id="results-container" class="results-container">
-                    <div class="step">
-                        <div class="step-title">Freight Calculation Complete</div>
-                        <p>The freight cost has been calculated based on your product specifications and shipping details.</p>
-                        
-                        <button class="show-calculation-toggle" id="show-calculation-toggle">Show Calculation Steps</button>
-                    </div>
-                    
-                    <div id="calculation-steps" class="calculation-steps">
-                        <div class="step">
-                            <div class="step-title">Step 1: Verifying Curb Type</div>
-                            <div id="step1-details"></div>
-                        </div>
-                        
-                        <div class="step">
-                            <div class="step-title">Step 2: Calculating Line Item Variables</div>
-                            <div id="step2-details"></div>
-                        </div>
-                        
-                        <div class="step">
-                            <div class="step-title">Step 3: Determining Shipping Weight Category</div>
-                            <div id="step3-details"></div>
-                        </div>
-                        
-                        <div class="step">
-                            <div class="step-title">Step 4: Applying Freight Rates</div>
-                            <div id="step4-details"></div>
-                        </div>
-                        
-                        <div class="step">
-                            <div class="step-title">Step 5: Final Calculations</div>
-                            <div id="step5-details"></div>
-                        </div>
-                    </div>
-                    
-                    <div class="card">
-                        <h3>Shipping Details</h3>
-                        <div class="result-item">
-                            <span class="result-label">Product Dimensions:</span>
-                            <span class="result-value" id="result-dimensions">0" × 0" × 0"</span>
-                        </div>
-                        <div class="result-item">
-                            <span class="result-label">Total Weight:</span>
-                            <span class="result-value" id="result-weight">0 lbs</span>
-                        </div>
-                        <div class="result-item">
-                            <span class="result-label">Volume:</span>
-                            <span class="result-value" id="result-volume">0 cubic ft</span>
-                        </div>
-                        <div class="result-item">
-                            <span class="result-label">Shipping From:</span>
-                            <span class="result-value" id="result-shipping-from">Not selected</span>
-                        </div>
-                        <div class="result-item">
-                            <span class="result-label">Shipping To:</span>
-                            <span class="result-value" id="result-shipping-to">Not selected</span>
-                        </div>
-                    </div>
-                    
-                    <div class="card">
-                        <h3>Freight Details</h3>
-                        <div class="result-item">
-                            <span class="result-label">Weight Per 100:</span>
-                            <span class="result-value" id="result-weight-per-100">0</span>
-                        </div>
-                        <div class="result-item">
-                            <span class="result-label">Freight Column:</span>
-                            <span class="result-value" id="result-freight-column">N/A</span>
-                        </div>
-                        <div class="result-item">
-                            <span class="result-label">Base Rate:</span>
-                            <span class="result-value" id="result-base-rate">$0.00</span>
-                        </div>
-                        <div class="result-item">
-                            <span class="result-label">Truck Load Type:</span>
-                            <span class="result-value" id="result-truck-load-type">N/A</span>
-                        </div>
-                        <div class="result-item">
-                            <span class="result-label">Freight Charge:</span>
-                            <span class="result-value" id="result-freight-charge">$0.00</span>
-                        </div>
-                    </div>
-                    
-                    <div class="total-section">
-                        <div class="total-cost" id="total-cost">Total Freight Cost: $0.00</div>
-                    </div>
-                    
-                    <div class="notes-section">
-                        <div class="notes-title">Notes:</div>
-                        <ul>
-                            <li>All prices are estimated and subject to change based on carrier availability.</li>
-                            <li>For large truck qualified orders, special rates may apply.</li>
-                            <li>Additional fees may apply for residential delivery or limited access locations.</li>
-                        </ul>
-                    </div>
-                    
-                    <div class="action-buttons">
-                        <button class="btn btn-secondary" id="reset-btn">Reset Calculator</button>
-                        <button class="btn btn-primary" id="confirm-btn">Confirm & Return</button>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <h1>Calculator Data Receiver Test</h1>
+    <p>This page tests receiving data from the parent website.</p>
+    
+    <div class="url-info">
+        <h2>Current URL Information</h2>
+        <p><strong>URL Parameters:</strong></p>
+        <pre id="url-parameters">Loading...</pre>
     </div>
-
+    
+    <div class="data-display">
+        <h2>Parsed URL Parameters</h2>
+        <table id="parsed-params">
+            <tr>
+                <th>Parameter</th>
+                <th>Value</th>
+            </tr>
+            <tr>
+                <td colspan="2">Loading parameters...</td>
+            </tr>
+        </table>
+    </div>
+    
+    <div class="action-buttons">
+        <button id="send-back">Send Data Back to Parent</button>
+        <button id="show-debug">Toggle Advanced Debug Info</button>
+    </div>
+    
+    <div id="debug-info" style="display: none; margin-top: 20px; background-color: #f0f0f0; padding: 15px; border-radius: 5px;">
+        <h2>Advanced Debug Information</h2>
+        <div id="debug-content"></div>
+    </div>
+    
     <script>
-        // Shipping rate data (would come from database in production)
-        const shippingRates = {
-            // Format: State, 0-5, 6-10, 11-20, 20+
-            'AL': [40.7, 37.4, 29.7, 24.2],
-            'AR': [42.9, 39.6, 36.3, 30.8],
-            'AZ': [56.1, 45.1, 38.5, 33.0],
-            'CA': [64.9, 52.8, 44.0, 37.4],
-            'CO': [60.5, 49.5, 39.6, 38.5],
-            'CT': [63.8, 52.8, 44.0, 41.8],
-            'DC': [46.2, 40.7, 34.1, 30.8],
-            'DE': [51.7, 45.1, 37.4, 26.4],
-            'FL': [53.9, 49.5, 41.8, 37.4],
-            // Additional states would be added here
-            'TX': [54.5, 47.2, 40.1, 35.6],
-            'NY': [58.7, 51.3, 45.2, 39.8],
-            'GA': [45.6, 41.2, 35.4, 29.3],
-            'OH': [47.8, 43.5, 37.9, 32.4],
-            'IL': [49.3, 44.7, 39.2, 33.8],
-            'MI': [52.1, 47.8, 41.5, 36.2],
-            'PA': [55.5, 49.9, 43.7, 37.5],
-            'KY': [44.2, 40.1, 35.6, 29.8],
-            'UT': [52.3, 46.8, 40.3, 35.1]
-        };
-        
-        // Constants based on flowchart
-        const CONSTANTS = {
-            LTL_FUEL_SURCHARGE_MULTIPLIER: 1.09,
-            MINIMUM_LARGE_TRUCK_FREIGHT: 95,
-            MINIMUM_TRUCK_LOAD: 90,
-            VOLUME_FREIGHT_MULTIPLIER: 7.5,
-            WIDE_LOAD_FREIGHT_CHARGE_PER_MILE: 5.00,
-            FREIGHT_MILES: {
-                'louisville': 750, // Example value
-                'saltlake': 850    // Example value
-            }
-        };
-        
-        // Curb type categorization
-        const curbTypeCategories = {
-            'add-on-1': ['MBC1', 'MBC3', 'MBC7', 'MBC7-3Piece', 'Butler-IF', 'MBC9', 'MBC10', 'MBC11'],
-            'add-on-2': ['Butler-IF', 'Duraorb', 'MBC9', 'MBC10', 'MBC11', 'MBC12', 'Inner-Curb'],
-            'add-on-3': ['Base-Panel', 'BR-II', 'MBC7-Extended', 'Seam-Kit'],
-            'add-on-4': ['OC-1', 'OC-2', 'OC-3', 'OC-4', 'OC-5', 'OC-6']
-        };
-        
-        // Parse URL parameters from parent page
+        // Function to parse URL parameters
         function getUrlParams() {
-            try {
-                const params = new URLSearchParams(window.location.search);
-                const data = {};
-                
-                for (const [key, value] of params) {
-                    // Decode URI component to handle special characters
-                    data[key] = decodeURIComponent(value);
-                }
-                
-                // Show debug info immediately
-                document.getElementById('debug-info').style.display = 'block';
-                debugLog('Raw URL parameters:', window.location.search);
-                debugLog('Parsed URL parameters:', data);
-                
-                return data;
-            } catch (error) {
-                debugLog('Error parsing URL parameters:', error.message);
-                return {};
+            const params = new URLSearchParams(window.location.search);
+            const data = {};
+            
+            for (const [key, value] of params) {
+                data[key] = value;
             }
+            
+            return data;
         }
         
-        // Debug logging helper function
+        // Function to add debug log
         function debugLog(message, data) {
-            const debugDiv = document.getElementById('debug-info');
             const debugContent = document.getElementById('debug-content');
-            
-            if (!debugDiv || !debugContent) return;
-            
-            // Show debug div
-            debugDiv.style.display = 'block';
             
             // Create log entry
             const logEntry = document.createElement('div');
@@ -781,7 +126,7 @@
             logEntry.innerHTML = `<strong>[${timestamp}]</strong> ${message}<br>`;
             
             // Add data if provided
-            if (data) {
+            if (data !== undefined) {
                 if (typeof data === 'object') {
                     logEntry.innerHTML += `<pre>${JSON.stringify(data, null, 2)}</pre>`;
                 } else {
@@ -791,526 +136,82 @@
             
             // Add to debug content
             debugContent.appendChild(logEntry);
-            
-            // Scroll to bottom
-            debugDiv.scrollTop = debugDiv.scrollHeight;
-        }
-        
-        // Update UI with dimensions from parent page
-        function updateDimensionsUI(data) {
-            // Log received data
-            debugLog('Attempting to update UI with data', data);
-            
-            // Update text display for dimensions
-            if (data.width && data.length && data.height && data.weight) {
-                try {
-                    // Convert to numbers and handle possible errors
-                    const width = parseFloat(data.width) || 0;
-                    const length = parseFloat(data.length) || 0;
-                    const height = parseFloat(data.height) || 0;
-                    const weight = parseFloat(data.weight) || 0;
-                    
-                    // Update form fields
-                    document.getElementById('width').value = width;
-                    document.getElementById('length').value = length;
-                    document.getElementById('height').value = height;
-                    document.getElementById('weight').value = weight;
-                    
-                    // Update 3D visualization
-                    document.getElementById('vis-width').textContent = width.toString();
-                    document.getElementById('vis-length').textContent = length.toString();
-                    document.getElementById('vis-height').textContent = height.toString();
-                    
-                    // Scale 3D box based on dimensions
-                    updatePackageVisualization(width, length, height);
-                    
-                    debugLog('Successfully updated dimensions UI');
-                } catch (error) {
-                    debugLog('Error updating dimensions UI', error.message);
-                }
-            } else {
-                debugLog('Missing dimension or weight data', {
-                    width: data.width,
-                    length: data.length,
-                    height: data.height,
-                    weight: data.weight
-                });
-            }
-            
-            // Update curb type if provided
-            if (data.curbType) {
-                try {
-                    document.getElementById('curb-type').value = data.curbType;
-                    debugLog('Updated curb type to', data.curbType);
-                } catch (error) {
-                    debugLog('Error updating curb type', error.message);
-                }
-            }
-            
-            // Update quote number if available
-            if (data.quoteNumber) {
-                try {
-                    document.getElementById('quote-number').textContent = data.quoteNumber;
-                    debugLog('Updated quote number to', data.quoteNumber);
-                } catch (error) {
-                    debugLog('Error updating quote number', error.message);
-                }
-            }
-        }
-        
-        // Update the 3D package visualization
-        function updatePackageVisualization(width, length, height) {
-            const maxDimension = Math.max(parseFloat(width), parseFloat(length), parseFloat(height));
-            const scaleFactor = 180 / maxDimension;
-            
-            const packageEl = document.getElementById('package-3d');
-            const scaledWidth = parseFloat(width) * scaleFactor;
-            const scaledLength = parseFloat(length) * scaleFactor;
-            const scaledHeight = parseFloat(height) * scaleFactor;
-            
-            packageEl.style.width = scaledWidth + 'px';
-            packageEl.style.height = scaledHeight + 'px';
-            
-            // Update all the 3D box faces
-            document.querySelector('.front').style.width = scaledWidth + 'px';
-            document.querySelector('.front').style.height = scaledHeight + 'px';
-            
-            document.querySelector('.back').style.width = scaledWidth + 'px';
-            document.querySelector('.back').style.height = scaledHeight + 'px';
-            
-            document.querySelector('.top').style.width = scaledWidth + 'px';
-            document.querySelector('.top').style.height = scaledLength + 'px';
-            
-            document.querySelector('.bottom').style.width = scaledWidth + 'px';
-            document.querySelector('.bottom').style.height = scaledLength + 'px';
-            document.querySelector('.bottom').style.transform = `rotateX(-90deg) translateZ(${scaledHeight}px)`;
-            
-            document.querySelector('.left').style.width = scaledLength + 'px';
-            document.querySelector('.left').style.height = scaledHeight + 'px';
-            
-            document.querySelector('.right').style.width = scaledLength + 'px';
-            document.querySelector('.right').style.height = scaledHeight + 'px';
-            document.querySelector('.right').style.transform = `rotateY(90deg) translateZ(${scaledWidth}px)`;
-        }
-        
-        // Get the add-on category for a curb type
-        function getCurbTypeCategory(curbType) {
-            for (const [category, types] of Object.entries(curbTypeCategories)) {
-                if (types.includes(curbType)) {
-                    return category;
-                }
-            }
-            return null;
-        }
-        
-        // Calculate shipping weight per 100
-        function calculateShippingWeightPer100(weight) {
-            return weight / 100;
-        }
-        
-        // Determine freight column based on shipping weight per 100
-        function determineFreightColumn(weightPer100) {
-            if (weightPer100 <= 5) {
-                return 1;
-            } else if (weightPer100 > 5 && weightPer100 <= 10) {
-                return 2;
-            } else if (weightPer100 > 10 && weightPer100 <= 20) {
-                return 3;
-            } else { // weightPer100 > 20
-                return 4;
-            }
-        }
-        
-        // Get base freight rate based on state and freight column
-        function getFreightRate(state, freightColumn) {
-            if (!shippingRates[state]) {
-                // Default rate if state not found
-                return 45.0;
-            }
-            
-            // Adjust for zero-based array index
-            return shippingRates[state][freightColumn - 1];
-        }
-        
-        // Calculate cubic volume in cubic feet
-        function calculateVolume(width, length, height) {
-            // Convert dimensions from inches to feet and calculate cubic feet
-            return (width * length * height) / 1728; // 1728 cubic inches = 1 cubic foot
-        }
-        
-        // Check if wide load based on dimensions
-        function isWideLoad(width, length) {
-            // Per flowchart logic: Width > 96" or Length > 120"
-            return width > 96 || length > 120;
-        }
-        
-        // Check if large truck qualified
-        function isLargeTruckQualified(width, length, height, weight) {
-            // This is simplified logic based on the flowchart
-            // In a real implementation, you would check all the criteria from the flowchart
-            return weight > 2000 || (width > 144 && length > 144);
-        }
-        
-        // Calculate truck load type and freight charge
-        function calculateFreight(data) {
-            debugLog('Calculating freight with data', data);
-            
-            const width = parseFloat(data.width);
-            const length = parseFloat(data.length);
-            const height = parseFloat(data.height);
-            const weight = parseFloat(data.weight);
-            const destination = data.state;
-            const shippingLocation = data.location;
-            
-            // Calculate weight per 100
-            const weightPer100 = calculateShippingWeightPer100(weight);
-            
-            // Determine freight column
-            const freightColumn = determineFreightColumn(weightPer100);
-            
-            // Get base freight rate
-            const baseRate = getFreightRate(destination, freightColumn);
-            
-            // Calculate volume
-            const volume = calculateVolume(width, length, height);
-            
-            // Check if wide load
-            const wideLoad = isWideLoad(width, length);
-            
-            // Check if large truck qualified
-            const largeTruckQualified = isLargeTruckQualified(width, length, height, weight);
-            
-            let truckLoadType;
-            let freightCharge;
-            
-            // Determine truck load type and calculate freight charge based on flowchart logic
-            if (largeTruckQualified) {
-                // LTL (Less Than Load) Freight
-                // Apply LTL fuel surcharge multiplier
-                const ltlFreight = baseRate * weight * CONSTANTS.LTL_FUEL_SURCHARGE_MULTIPLIER / 100;
-                
-                if (wideLoad) {
-                    // Wide Load Freight calculation
-                    const wideLoadFreight = CONSTANTS.WIDE_LOAD_FREIGHT_CHARGE_PER_MILE * CONSTANTS.FREIGHT_MILES[shippingLocation];
-                    
-                    // Compare the two and use the higher value
-                    if (ltlFreight >= wideLoadFreight) {
-                        truckLoadType = "LTL Freight";
-                        freightCharge = ltlFreight;
-                    } else {
-                        truckLoadType = "Wide Load Freight";
-                        freightCharge = wideLoadFreight;
-                    }
-                } else {
-                    truckLoadType = "LTL Freight";
-                    freightCharge = ltlFreight;
-                }
-                
-                // Apply minimum freight charge if applicable
-                if (freightCharge < CONSTANTS.MINIMUM_LARGE_TRUCK_FREIGHT) {
-                    freightCharge = CONSTANTS.MINIMUM_LARGE_TRUCK_FREIGHT;
-                }
-            } else {
-                // Not large truck qualified - compare volume-based freight vs regular
-                const volumeFreight = volume * CONSTANTS.VOLUME_FREIGHT_MULTIPLIER;
-                const regularFreight = baseRate * weight / 100;
-                
-                if (volumeFreight > regularFreight) {
-                    truckLoadType = "Volume-Based Freight";
-                    freightCharge = volumeFreight;
-                } else {
-                    truckLoadType = "Standard Freight";
-                    freightCharge = regularFreight;
-                }
-                
-                // Apply minimum freight charge if applicable
-                if (freightCharge < CONSTANTS.MINIMUM_TRUCK_LOAD) {
-                    freightCharge = CONSTANTS.MINIMUM_TRUCK_LOAD;
-                }
-            }
-            
-            const result = {
-                weightPer100,
-                freightColumn,
-                baseRate,
-                volume,
-                truckLoadType,
-                freightCharge,
-                wideLoad,
-                largeTruckQualified
-            };
-            
-            debugLog('Freight calculation result', result);
-            
-            return result;
-        }
-        
-        // Format currency for display
-        function formatCurrency(amount) {
-            return ' + amount.toFixed(2);
-        }
-        
-        // Display calculation results
-        function displayResults(data, results) {
-            // Show results container
-            document.getElementById('calculation-instructions').style.display = 'none';
-            document.getElementById('results-container').style.display = 'block';
-            
-            // Update shipping details
-            document.getElementById('result-dimensions').textContent = 
-                `${data.width}" × ${data.length}" × ${data.height}"`;
-            document.getElementById('result-weight').textContent = `${data.weight} lbs`;
-            document.getElementById('result-volume').textContent = `${results.volume.toFixed(2)} cubic ft`;
-            document.getElementById('result-shipping-from').textContent = 
-                data.location === 'louisville' ? 'Louisville, KY' : 'Salt Lake City, UT';
-            document.getElementById('result-shipping-to').textContent = 
-                `${document.getElementById('destination-state').options[document.getElementById('destination-state').selectedIndex].text} (${data.zipCode})`;
-            
-            // Update freight details
-            document.getElementById('result-weight-per-100').textContent = results.weightPer100.toFixed(2);
-            document.getElementById('result-freight-column').textContent = results.freightColumn;
-            document.getElementById('result-base-rate').textContent = formatCurrency(results.baseRate);
-            document.getElementById('result-truck-load-type').textContent = results.truckLoadType;
-            document.getElementById('result-freight-charge').textContent = formatCurrency(results.freightCharge);
-            
-            // Update total cost
-            document.getElementById('total-cost').textContent = `Total Freight Cost: ${formatCurrency(results.freightCharge)}`;
-            
-            // Update calculation steps for transparency
-            updateCalculationSteps(data, results);
-        }
-        
-        // Update detailed calculation steps
-        function updateCalculationSteps(data, results) {
-            // Step 1: Verifying Curb Type
-            let curbTypeCategory = getCurbTypeCategory(data.curbType);
-            document.getElementById('step1-details').innerHTML = `
-                <p>Selected Curb Type: <strong>${data.curbType}</strong></p>
-                <p>Category: <strong>${curbTypeCategory || 'Not categorized'}</strong></p>
-            `;
-            
-            // Step 2: Calculating Line Item Variables
-            document.getElementById('step2-details').innerHTML = `
-                <p>Dimensions: <strong>${data.width}" × ${data.length}" × ${data.height}"</strong></p>
-                <p>Weight: <strong>${data.weight} lbs</strong></p>
-                <p>Volume: <strong>${results.volume.toFixed(2)} cubic ft</strong></p>
-                <p>Wide Load: <strong>${results.wideLoad ? 'Yes' : 'No'}</strong></p>
-                <p>Large Truck Qualified: <strong>${results.largeTruckQualified ? 'Yes' : 'No'}</strong></p>
-            `;
-            
-            // Step 3: Determining Shipping Weight Category
-            document.getElementById('step3-details').innerHTML = `
-                <p>Weight per 100 lbs: <strong>${results.weightPer100.toFixed(2)}</strong></p>
-                <p>Freight Column: <strong>${results.freightColumn}</strong> (${getWeightCategoryDescription(results.freightColumn)})</p>
-            `;
-            
-            // Step 4: Applying Freight Rates
-            document.getElementById('step4-details').innerHTML = `
-                <p>Destination State: <strong>${data.state}</strong></p>
-                <p>Base Rate per 100 lbs: <strong>${formatCurrency(results.baseRate)}</strong></p>
-                <p>Shipping From: <strong>${data.location === 'louisville' ? 'Louisville, KY' : 'Salt Lake City, UT'}</strong></p>
-            `;
-            
-            // Step 5: Final Calculations
-            let finalCalcDetails = `
-                <p>Truck Load Type: <strong>${results.truckLoadType}</strong></p>
-            `;
-            
-            if (results.truckLoadType === "LTL Freight") {
-                finalCalcDetails += `
-                    <p>Calculation: <strong>${results.baseRate} × ${data.weight} × ${CONSTANTS.LTL_FUEL_SURCHARGE_MULTIPLIER} ÷ 100 = ${formatCurrency(results.freightCharge)}</strong></p>
-                `;
-            } else if (results.truckLoadType === "Wide Load Freight") {
-                finalCalcDetails += `
-                    <p>Calculation: <strong>${CONSTANTS.WIDE_LOAD_FREIGHT_CHARGE_PER_MILE} × ${CONSTANTS.FREIGHT_MILES[data.location]} = ${formatCurrency(results.freightCharge)}</strong></p>
-                `;
-            } else if (results.truckLoadType === "Volume-Based Freight") {
-                finalCalcDetails += `
-                    <p>Calculation: <strong>${results.volume.toFixed(2)} × ${CONSTANTS.VOLUME_FREIGHT_MULTIPLIER} = ${formatCurrency(results.freightCharge)}</strong></p>
-                `;
-            } else {
-                // Standard Freight
-                finalCalcDetails += `
-                    <p>Calculation: <strong>${results.baseRate} × ${data.weight} ÷ 100 = ${formatCurrency(results.freightCharge)}</strong></p>
-                `;
-            }
-            
-            finalCalcDetails += `
-                <p>Final Freight Cost: <strong>${formatCurrency(results.freightCharge)}</strong></p>
-            `;
-            
-            document.getElementById('step5-details').innerHTML = finalCalcDetails;
-        }
-        
-        // Get description for weight category
-        function getWeightCategoryDescription(freightColumn) {
-            switch (freightColumn) {
-                case 1: return "0 to 5 per 100 lbs";
-                case 2: return "6 to 10 per 100 lbs";
-                case 3: return "11 to 20 per 100 lbs";
-                case 4: return "20+ per 100 lbs";
-                default: return "Unknown";
-            }
-        }
-        
-        // Validate form inputs
-        function validateInputs() {
-            const width = document.getElementById('width').value;
-            const length = document.getElementById('length').value;
-            const height = document.getElementById('height').value;
-            const weight = document.getElementById('weight').value;
-            const curbType = document.getElementById('curb-type').value;
-            const location = document.getElementById('shipping-location').value;
-            const state = document.getElementById('destination-state').value;
-            const zipCode = document.getElementById('zip-code').value;
-            
-            if (!width || !length || !height || !weight) {
-                alert('Please enter all dimensions and weight.');
-                return false;
-            }
-            
-            if (!curbType) {
-                alert('Please select a curb type.');
-                return false;
-            }
-            
-            if (!location) {
-                alert('Please select a shipping location.');
-                return false;
-            }
-            
-            if (!state) {
-                alert('Please select a destination state.');
-                return false;
-            }
-            
-            if (!zipCode || zipCode.length < 5) {
-                alert('Please enter a valid ZIP code.');
-                return false;
-            }
-            
-            return {
-                width,
-                length,
-                height,
-                weight,
-                curbType,
-                location,
-                state,
-                zipCode
-            };
         }
         
         // Send data back to parent window
-        function sendDataToParent(shippingCost, shippingType) {
-            debugLog('Attempting to send data to parent window', { shippingCost, shippingType });
+        function sendDataToParent(testData) {
+            debugLog('Attempting to send data to parent window', testData);
             
             // Check if we have a parent window
             if (window.opener && window.opener !== window) {
                 try {
-                    // Remove dollar sign if present
-                    const cost = shippingCost.replace(', '');
-                    
                     // Send message to parent window
                     window.opener.postMessage({
-                        shippingCost: cost,
-                        shippingType: shippingType
-                    }, '*'); // In production, specify exact origin for security
+                        shippingCost: '125.50',
+                        shippingType: 'Test Shipping Type',
+                        testData: testData
+                    }, '*');
                     
                     debugLog('Message sent to parent window');
+                    alert('Data sent to parent window!');
                     
                     // Close this window
-                    setTimeout(() => window.close(), 500);
+                    // setTimeout(() => window.close(), 2000);
                 } catch (error) {
                     debugLog('Error sending message to parent', error.message);
                     alert('Error sending data to parent window: ' + error.message);
                 }
             } else {
                 debugLog('No parent window found');
-                alert('Shipping cost: ' + shippingCost + '\nCannot communicate with parent window.');
+                alert('Cannot send data back - no parent window detected');
             }
         }
         
-        // Event handlers
+        // Initialize the page
         document.addEventListener('DOMContentLoaded', function() {
-            // Get data from URL parameters
-            const urlParams = getUrlParams();
-            debugLog('URL parameters detected', urlParams);
+            // Display the URL parameters
+            document.getElementById('url-parameters').textContent = window.location.search;
+            debugLog('Page loaded with URL', window.location.href);
             
-            // Update UI if data exists
-            if (urlParams.width && urlParams.length && urlParams.height && urlParams.weight) {
-                updateDimensionsUI(urlParams);
+            // Parse URL parameters
+            const params = getUrlParams();
+            debugLog('Parsed URL parameters', params);
+            
+            // Display parsed parameters
+            const paramsTable = document.getElementById('parsed-params');
+            
+            // Clear the loading message
+            paramsTable.innerHTML = '<tr><th>Parameter</th><th>Value</th></tr>';
+            
+            // Check if we have any parameters
+            if (Object.keys(params).length === 0) {
+                paramsTable.innerHTML += '<tr><td colspan="2">No parameters found</td></tr>';
+            } else {
+                // Add each parameter to the table
+                for (const [key, value] of Object.entries(params)) {
+                    paramsTable.innerHTML += `
+                        <tr>
+                            <td>${key}</td>
+                            <td>${value}</td>
+                        </tr>
+                    `;
+                }
             }
             
-            // Calculate button event
-            document.getElementById('calculate-btn').addEventListener('click', function() {
-                const formData = validateInputs();
-                
-                if (!formData) {
-                    return;
-                }
-                
-                // Calculate freight
-                const results = calculateFreight(formData);
-                
-                // Display results
-                displayResults(formData, results);
+            // Button to send data back to parent
+            document.getElementById('send-back').addEventListener('click', function() {
+                sendDataToParent(params);
             });
             
-            // Reset button event
-            document.getElementById('reset-btn').addEventListener('click', function() {
-                // Hide results
-                document.getElementById('calculation-instructions').style.display = 'block';
-                document.getElementById('results-container').style.display = 'none';
-                
-                // Reset form
-                document.getElementById('curb-type').value = '';
-                document.getElementById('shipping-location').value = '';
-                document.getElementById('destination-state').value = '';
-                document.getElementById('zip-code').value = '';
-                
-                // Don't reset dimensions if they came from parent page
-                if (!urlParams.width && !urlParams.length && !urlParams.height && !urlParams.weight) {
-                    document.getElementById('width').value = '';
-                    document.getElementById('length').value = '';
-                    document.getElementById('height').value = '';
-                    document.getElementById('weight').value = '';
-                }
-            });
-            
-            // Confirm button event
-            document.getElementById('confirm-btn').addEventListener('click', function() {
-                // Get calculated freight charge
-                const freightCharge = document.getElementById('result-freight-charge').textContent;
-                const truckLoadType = document.getElementById('result-truck-load-type').textContent;
-                
-                // Send data back to parent window
-                sendDataToParent(freightCharge, truckLoadType);
-            });
-            
-            // Show/hide calculation steps
-            document.getElementById('show-calculation-toggle').addEventListener('click', function() {
-                const calculationSteps = document.getElementById('calculation-steps');
-                
-                if (calculationSteps.style.display === 'none' || calculationSteps.style.display === '') {
-                    calculationSteps.style.display = 'block';
-                    this.textContent = 'Hide Calculation Steps';
+            // Button to toggle debug info
+            document.getElementById('show-debug').addEventListener('click', function() {
+                const debugInfo = document.getElementById('debug-info');
+                if (debugInfo.style.display === 'none') {
+                    debugInfo.style.display = 'block';
+                    this.textContent = 'Hide Advanced Debug Info';
                 } else {
-                    calculationSteps.style.display = 'none';
-                    this.textContent = 'Show Calculation Steps';
-                }
-            });
-            
-            // Show/hide rate table
-            document.getElementById('show-rates-toggle').addEventListener('click', function() {
-                const rateTable = document.getElementById('rate-table-container');
-                
-                if (rateTable.style.display === 'none' || rateTable.style.display === '') {
-                    rateTable.style.display = 'block';
-                    this.textContent = 'Hide Shipping Rate Table';
-                } else {
-                    rateTable.style.display = 'none';
-                    this.textContent = 'Show Shipping Rate Table';
+                    debugInfo.style.display = 'none';
+                    this.textContent = 'Show Advanced Debug Info';
                 }
             });
         });
